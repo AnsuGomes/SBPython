@@ -8,7 +8,7 @@ from PIL import ImageTk, Image
 #tela
 master = Tk()
 master.title('Banking App')
-master.geometry("270x350")
+master.geometry("280x350")
 
 #funcoes
 def finish_reg():
