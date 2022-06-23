@@ -1,5 +1,4 @@
-from cgitb import text
-from sqlite3 import Row
+from operator import length_hint
 from tkinter import *
 import os
 
@@ -9,7 +8,7 @@ from PIL import ImageTk, Image
 #tela
 master = Tk()
 master.title('Banking App')
-master.geometry("250x380")
+master.geometry("270x350")
 
 #funcoes
 def finish_reg():
@@ -23,7 +22,13 @@ def finish_reg():
     print(all_accounts)
 
     if name == "" or age == "" or gender == "" or password == "":
-        notif.config(fg="red", text="Todos os dados precisam ser preenchidos!!")
+        notif.config(fg="red", text="Todos os dados precisam ser preenchidos!! ")
+        return
+    if len(password) < 5 :
+        notif.config(fg="red", text="Senha tem que ter entre 5 e 7 caracteres!!")
+        return
+    if len(password) > 7 :
+        notif.config(fg="red", text="Senha tem que ter entre 5 e 7 caracteres!! ")
         return
     for name_check in all_accounts:
         if name == name_check:
@@ -40,7 +45,6 @@ def finish_reg():
             new_file.write('0')
             new_file.close()
             notif.config(fg="green", text="A conta foi criada.")
-         
 
 def register():
     global temp_name
@@ -58,24 +62,24 @@ def register():
     temp_opc2 = StringVar()
 
     register_screen = Toplevel(master)
-    register_screen.title('Registro')  
-    register_screen.geometry("300x350")
+    register_screen.title('Registro') 
+    register_screen.geometry=("270x400") 
     
    
-    Label(register_screen, text="Por favor, insira seus dados para o cadastro:", font=('Calibri',12)).grid(row=0, sticky=N, pady=10)
-    Label(register_screen, text="Nome", font=('Calibri',12)).grid(row=1, sticky=W)
-    Label(register_screen, text="Idade", font=('Calibri',12)).grid(row=2, sticky=W)
-    Label(register_screen, text="Gênero", font=('Calibri',12)).grid(row=3, sticky=W)
-    Label(register_screen, text="Senha", font=('Calibri',12)).grid(row=4, sticky=W)
-    Label(register_screen, text="Opção de conta: ", font=('Calibri',12)).grid(row=6, sticky=W)
+    Label(register_screen, text="Por favor, insira seus dados para o cadastro:", fg="purple", font=('Calibri',12)).grid(row=0, sticky=N, pady=10)
+    Label(register_screen, text="Nome", fg="purple", font=('Calibri',12)).grid(row=1, sticky=W)
+    Label(register_screen, text="Idade", fg="purple", font=('Calibri',12)).grid(row=2, sticky=W)
+    Label(register_screen, text="Gênero",fg="purple", font=('Calibri',12)).grid(row=3, sticky=W)
+    Label(register_screen, text="Senha", fg="purple", font=('Calibri',12)).grid(row=4, sticky=W)
+    Label(register_screen, text="Opção de conta: ", fg="purple", font=('Calibri',12)).grid(row=6, sticky=W)
 
 
   
-    var = StringVar()
-    Checkbutton(register_screen, text="Conta Poupanca", variable=var).grid(row=7, padx=(0,0))
     
-    var2 = StringVar()
-    Checkbutton(register_screen, text="Conta Corrente", variable=var2).grid(row=8, padx=(0,0))
+    Checkbutton(register_screen, text="Conta Poupanca", fg="purple", variable=temp_opc).grid(row=7, padx=(0,0))
+    
+    
+    Checkbutton(register_screen, text="Conta Corrente", fg="purple", variable=temp_opc2).grid(row=8, padx=(0,0))
     
 
     notif = Label(register_screen, font=('Calibri',12))
@@ -85,9 +89,11 @@ def register():
     Entry (register_screen, textvariable=temp_age).grid(row=2, column=0)
     Entry (register_screen, textvariable=temp_gender).grid(row=3, column=0)
     Entry (register_screen, textvariable=temp_password, show="*").grid(row=4, column=0)
-       
+    
+
+
     #butoes
-    Button(register_screen, text="Registro", command= finish_reg, font=('Calibri', 12)).grid(row=9, sticky=N, pady=10)
+    Button(register_screen, text="Registro", fg="purple", command= finish_reg, font=('Calibri', 12)).grid(row=9, sticky=N, pady=10)
     
 
 def login_session():
@@ -110,11 +116,11 @@ def login_session():
                 account_dashboard.title('Dashboard')
 
                 #Label
-                Label(account_dashboard, text="Dashboard de conta", fg="purple",font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
-                Label(account_dashboard, text="Olá " + name + " , seja bem-vindo!" , fg="purple", font=('Calibri', 12)).grid(row=1, sticky=N, pady=5)
+                Label(account_dashboard, text="Dashboard de conta",fg="purple", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+                Label(account_dashboard, text="Olá " + name + " seja muito bem-vindo!", fg="purple", font=('Calibri', 12)).grid(row=1, sticky=N, pady=5)
                 #butoes
                 Button(account_dashboard, text="Dados pessoais", fg="purple",font=('Calibri',12),width=30, command=dados_pessoais).grid(row=2,sticky=N, padx=10)
-                Button(account_dashboard, text="Depósito", fg="purple", font=('Calibri', 12),width=30, command = deposito).grid(row=3,sticky=N, padx=10)
+                Button(account_dashboard, text="Depósito",fg="purple", font=('Calibri', 12),width=30, command = deposito).grid(row=3,sticky=N, padx=10)
                 Button(account_dashboard, text="Saque", fg="purple", font=('Calibri', 12),width=30, command = saque).grid(row=4,sticky=N, padx=10)
                 Label(account_dashboard).grid(row=5, sticky=N, pady=10)
                 return
@@ -124,6 +130,40 @@ def login_session():
   
     login_notif.config(fg="red", text="Nenhuma conta encontrada!")  
 
+def login_funcionario():
+    global login_name
+    all_accounts = os.listdir()
+    login_name = temp_login_name.get()
+    login_password = temp_login_password.get()
+
+    for name in all_accounts:
+        
+        if name == login_name:
+            file = open(name, "r")
+            file_data = file.read()
+            file_data = file_data.split('\n')
+            password = file_data[1]
+            if len(password) > 6:
+                #dashboard da conta
+                if login_password == password:
+                    login_screen.destroy()
+                    account_dashboard = Toplevel(master)
+                    account_dashboard.title('Dashboard')
+
+                    #Label
+                    Label(account_dashboard, text="Dashboard de conta: ", fg="purple", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+                    Label(account_dashboard, text="Olá " + name + " seja muito bem-vindo!", fg="purple", font=('Calibri', 12)).grid(row=1, sticky=N, pady=5)
+                    #butoes
+                    Button(account_dashboard, text="Dados pessoais ", fg="purple", font=('Calibri',12),width=30, command=dados_pessoais).grid(row=2,sticky=N, padx=10)
+                    Button(account_dashboard, text="Criar nova conta",fg="purple", font=('Calibri', 12),width=30, command = register).grid(row=3,sticky=N, padx=10)
+                    Button(account_dashboard, text="Buscar conta", fg="purple", font=('Calibri', 12),width=30, command = login).grid(row=4,sticky=N, padx=10)
+                    Label(account_dashboard).grid(row=5, sticky=N, pady=10)
+                    return
+            else:
+                login_notif.config(fg="red", text="Senha incorreta!")    
+                return
+  
+    login_notif.config(fg="red", text="Nenhuma conta encontrada!")  
 def deposito():
     #vars
     global amount
@@ -140,10 +180,10 @@ def deposito():
     deposito_screen.title('Deposito')
 
     #Label
-    Label(deposito_screen, text="Deposito", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
-    current_balance_label = Label(deposito_screen, text="Saldo atual: £" +details_balance, font=('Calibri', 12))
+    Label(deposito_screen, text="Deposito:", fg="purple", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+    current_balance_label = Label(deposito_screen, text="Saldo atual: £"  +details_balance,fg="purple", font=('Calibri', 12))
     current_balance_label.grid(row=1, sticky=W)
-    Label(deposito_screen, text="Valor: ",font=('Calibri', 12)).grid(row=2, sticky=W)
+    Label(deposito_screen, text="Valor: ", fg="purple", font=('Calibri', 12)).grid(row=2, sticky=W)
     deposito_notif = Label(deposito_screen, font=('Calibri',12))
     deposito_notif.grid(row=4, sticky=N, pady=5)
 
@@ -151,7 +191,7 @@ def deposito():
     Entry(deposito_screen, textvariable=amount).grid(row=2, column=1)
 
     #butao
-    Button(deposito_screen, text="Finalisar", font=('Calibri', 12), command=finish_deposito).grid(row=3, sticky=W, pady=5)
+    Button(deposito_screen, text="Finalisar", fg="purple", font=('Calibri', 12), command=finish_deposito).grid(row=3, sticky=W, pady=5)
 
 def finish_deposito():
     if amount.get() == "":
@@ -192,10 +232,10 @@ def saque():
     saque_screen.title('Saque')
 
     #Label
-    Label(saque_screen, text="Deposito", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
-    current_balance_label = Label(saque_screen, text="Saldo atual: £" +details_balance, font=('Calibri', 12))
+    Label(saque_screen, text="Saque:", fg="purple", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+    current_balance_label = Label(saque_screen, text="Saldo atual: £" +details_balance, fg="purple", font=('Calibri', 12))
     current_balance_label.grid(row=1, sticky=W)
-    Label(saque_screen, text="Valor: ", fg="purple", font=('Calibri', 12)).grid(row=2, sticky=W)
+    Label(saque_screen, text="Valor: ", fg="purple",font=('Calibri', 12)).grid(row=2, sticky=W)
     saque_notif = Label(saque_screen, font=('Calibri',12))
     saque_notif.grid(row=4, sticky=N, pady=5)
 
@@ -210,7 +250,7 @@ def finish_saque():
         saque_notif.config(text='O valor é necessário!', fg="red")
         return
     if float(saque_amount.get()) <=0:
-        saque_notif.config(text='Saldo negativo não é aceito!', fg='red')    
+        saque_notif.config(text='Valor inserido não é aceito!', fg='red')    
         return
 
     file = open(login_name, 'r+')
@@ -252,15 +292,16 @@ def dados_pessoais():
     #dados pessoais
     dados_pessoais_screen = Toplevel(master)
     dados_pessoais_screen.title('Dados Pessoais')
+    dados_pessoais_screen.geometry=("1200x100")
 
     #Label
-    Label(dados_pessoais_screen, text="Dados pessoais", fg="purple", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
-    Label(dados_pessoais_screen, text="Nome : " + dados_nome, fg="purple",font=('Calibri', 12)).grid(row=1, sticky=W)
-    Label(dados_pessoais_screen, text="Age : " + dados_age, font=('Calibri', 12)).grid(row=2, sticky=W)
-    Label(dados_pessoais_screen, text="Gender : " + dados_gender, font=('Calibri', 12)).grid(row=3, sticky=W)
-    Label(dados_pessoais_screen, text="Conta Poupanca" + dados_temp_opc, font=('Calibri', 12)).grid(row=4, sticky=W)
-    Label(dados_pessoais_screen, text="Conta Corrente" + dados_temp_opc2, font=('Calibri', 12)).grid(row=5, sticky=W)
-    Label(dados_pessoais_screen, text="Balance : £ " + dados_balance, font=('Calibri', 12)).grid(row=6, sticky=W)
+    Label(dados_pessoais_screen, text="Dados pessoais", fg="purple",font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+    Label(dados_pessoais_screen, text="Nome : " + dados_nome, fg="purple", font=('Calibri', 12)).grid(row=1, sticky=W)
+    Label(dados_pessoais_screen, text="Age : " + dados_age, fg="purple",font=('Calibri', 12)).grid(row=2, sticky=W)
+    Label(dados_pessoais_screen, text="Gender : " + dados_gender,fg="purple", font=('Calibri', 12)).grid(row=3, sticky=W)
+    Label(dados_pessoais_screen, text="Conta Poupanca :" + dados_temp_opc, fg="purple", font=('Calibri', 12)).grid(row=4, sticky=W)
+    Label(dados_pessoais_screen, text="Conta Corrente :" + dados_temp_opc2, fg="purple", font=('Calibri', 12)).grid(row=5, sticky=W)
+    Label(dados_pessoais_screen, text="Balance : £ " + dados_balance, fg="purple", font=('Calibri', 12)).grid(row=6, sticky=W)
     
 def login():
     #vars
@@ -274,8 +315,8 @@ def login():
     login_screen.title('Login')
 
     #label
-    Label(login_screen, text="Login para sua conta:", fg="purple", font=('Calibri',12)).grid(row=0,sticky=N,pady=10)
-    Label(login_screen, text="Usuário", fg="purple",font=('Calibri',12)).grid(row=1,sticky=W)
+    Label(login_screen, text="Login para sua conta", fg="purple", font=('Calibri',12)).grid(row=0,sticky=N,pady=10)
+    Label(login_screen, text="Usuário", fg="purple", font=('Calibri',12)).grid(row=1,sticky=W)
     Label(login_screen, text="Senha", fg="purple", font=('Calibri',12)).grid(row=2,sticky=W)
     login_notif = Label(login_screen, font=('Calibri',12))
     login_notif.grid(row=4,sticky=N)
@@ -285,22 +326,20 @@ def login():
     Entry(login_screen, textvariable=temp_login_password, show="*").grid(row=2,column=1,padx=5)
 
     #butoes
-    Button(login_screen, text="Login", fg="purple", command=login_session, width=15,font=('Calibri',12)).grid(row=3,sticky=W,pady=5,padx=5)
+    Button(login_screen, text="Login", command=login_session, width=15, fg="purple",font=('Calibri',12)).grid(row=3,sticky=W,pady=5,padx=5)
+    Button(login_screen, text="Login funcionario", command=login_funcionario, width=15, fg="purple",font=('Calibri',12)).grid(row=6,sticky=W,pady=5,padx=5)
 
 #importar imagens
-img = Image.open('dinheiro.jpg')
+img = Image.open('images.jpg')
 img = img.resize((150,150))
 img = ImageTk.PhotoImage(img)
 
 Label(master, text="Custom Banking Beta", fg="purple", font=('Calibri', 12)).grid(row=1, sticky=N, pady=10)    
-Label(master, text="O banco mais simples que você usou.",fg="purple", font=('Calibri', 12)).grid(row=2, sticky=N) 
+Label(master, text="O banco mais simples que você já usou.", fg="purple", font=('Calibri', 12)).grid(row=2, sticky=N) 
 Label(master, image=img).grid(row=3, sticky=N, pady=10)
 
 #butoes
-Button(master, text="Registro", fg="purple",font=('Calibri',12), width=20, command=register).grid(row=4, sticky=N)
-Button(master, text="Login", fg="purple", font=('Calibri',12), width=20, command=login).grid(row=5, sticky=N, pady=10)
+Button(master, text="Registro", fg="purple", font=('Calibri',12), width=20, command=register).grid(row=4, sticky=N)
+Button(master, text="Login", fg="purple",font=('Calibri',12), width=20, command=login).grid(row=5, sticky=N, pady=10)
 
 master.mainloop()
-
-
-
